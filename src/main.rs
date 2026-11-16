@@ -1,5 +1,6 @@
 mod dialog;
 mod palette;
+mod widgets;
 
 use eframe::egui;
 
