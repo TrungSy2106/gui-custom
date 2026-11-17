@@ -37,14 +37,18 @@ impl ColorDialog {
     }
 
     fn swatch(&mut self, ui: &egui::Ui, area: Rect, index: u8) {
+        let p = ui.painter();
+        let area = p.round_rect_to_pixels(area);
         let response = ui
             .interact(area, egui::Id::new(("aci", index)), egui::Sense::click())
             .on_hover_text(index.to_string());
-        let p = ui.painter();
-        p.rect_filled(area.shrink(0.5), 0.0, palette::aci(index));
+        let pixel = 1.0 / ui.ctx().pixels_per_point();
+        solid_rect(p, area, Color32::WHITE);
+        let fill = Rect::from_min_max(area.min, area.max - vec2(pixel, pixel));
+        solid_rect(p, fill, palette::aci(index));
         if response.hovered() || self.selected == Some(index as u16) {
-            p.rect_stroke(area.shrink(1.0), 0.0, stroke(1.0, Color32::BLACK));
-            p.rect_stroke(area.shrink(2.0), 0.0, stroke(1.0, Color32::WHITE));
+            p.rect_stroke(fill.shrink(pixel * 0.5), 0.0, stroke(pixel, Color32::BLACK));
+            p.rect_stroke(fill.shrink(pixel * 1.5), 0.0, stroke(pixel, Color32::WHITE));
         }
         if response.clicked() {
             self.select_index(index as u16);

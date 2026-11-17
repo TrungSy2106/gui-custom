@@ -29,7 +29,15 @@ pub fn centered(p: &Painter, area: Rect, value: &str) {
 }
 
 pub fn panel(p: &Painter, area: Rect, color: Color32, radius: f32) {
-    p.rect(area, radius, color, stroke(1.0, Color32::from_gray(210)));
+    let pixel = 1.0 / p.ctx().pixels_per_point();
+    let area = p.round_rect_to_pixels(area).shrink(pixel * 0.5);
+    p.rect(area, radius, color, stroke(pixel, Color32::from_gray(210)));
+}
+
+pub fn solid_rect(p: &Painter, area: Rect, color: Color32) {
+    let mut mesh = egui::Mesh::default();
+    mesh.add_colored_rect(p.round_rect_to_pixels(area), color);
+    p.add(mesh);
 }
 
 pub fn button(ui: &egui::Ui, area: Rect, title: &str) -> bool {

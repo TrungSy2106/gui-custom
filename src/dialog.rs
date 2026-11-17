@@ -56,7 +56,6 @@ impl ColorDialog {
             },
         );
         for (x, title) in [(159.0, "OK"), (263.0, "Cancel"), (367.0, "Help")] {
-            // Các nút chỉ phản hồi hover/bấm trong bản preview.
             button(ui, rect(x, 428.0, 97.0, 26.0), title);
         }
     }
@@ -102,11 +101,7 @@ impl ColorDialog {
     }
 
     fn tabs(&mut self, ui: &mut egui::Ui) {
-        let tabs = [
-            (8.0, 118.0, "Index Color"),
-            (126.0, 124.0, "True Color"),
-            (250.0, 115.0, "Color Books"),
-        ];
+        let tabs = [(8.0, 118.0, "Index Color"), (126.0, 124.0, "True Color")];
         for (i, &(x, width, title)) in tabs.iter().enumerate().take(2) {
             if ui
                 .interact(
@@ -327,6 +322,14 @@ impl eframe::App for ColorDialog {
     }
 
     fn update(&mut self, ctx: &egui::Context, _: &mut eframe::Frame) {
+        // Preview 1:1 với ảnh mẫu, kể cả khi Windows dùng DPI 125%/150%.
+        if (ctx.pixels_per_point() - 1.0).abs() > 0.001 {
+            ctx.set_pixels_per_point(1.0);
+            return;
+        }
+        if (ctx.screen_rect().size() - vec2(SIZE[0], SIZE[1])).length() > 0.5 {
+            ctx.send_viewport_cmd(egui::ViewportCommand::InnerSize(SIZE.into()));
+        }
         egui::CentralPanel::default()
             .frame(egui::Frame::none())
             .show(ctx, |ui| self.show(ui));
